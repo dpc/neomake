@@ -352,11 +352,14 @@ function! neomake#makers#ft#python#python() abort
         \ 'output_stream': 'stdout',
         \ 'short_name': 'py',
         \ }
-    function! maker.fn(jobinfo) abort
-        let exe_args = neomake#utils#get_exe_args_from_shebang(a:jobinfo.bufnr)
-        if !empty(exe_args)
-            let self.exe = exe_args[0]
-            let self.args = exe_args[1:] + self.args
+    function! maker.InitForJob(jobinfo) abort
+        let bufnr = get(a:jobinfo, 'bufnr', '')
+        if bufnr isnot# ''
+            let exe_args = neomake#utils#get_exe_args_from_shebang(bufnr)
+            if !empty(exe_args)
+                let self.exe = exe_args[0]
+                let self.args = exe_args[1:] + self.args
+            endif
         endif
     endfunction
     return maker

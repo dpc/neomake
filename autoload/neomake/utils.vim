@@ -560,7 +560,7 @@ else
 endif
 
 function! neomake#utils#get_exe_args_from_shebang(bufnr) abort
-    let line1 = getline(1)
+    let line1 = get(getbufline(a:bufnr, 1), 0)
     if line1[0:1] ==# '#!'
         let shebang = substitute(line1[2:], '\v^\s+|\s+$', '', '')
         return split(shebang)

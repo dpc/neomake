@@ -333,12 +333,32 @@ Execute (python: uses shebang from buffer for exe/args):
   noautocmd setfiletype python
   call setline(1, ['#!/usr/bin/env python'])
 
-  let maker = neomake#GetMaker('python')
   let jobinfo = NeomakeTestsFakeJobinfo()
-  let maker = neomake#core#instantiate_maker(maker, jobinfo, 0)
 
+  let maker = neomake#core#instantiate_maker(neomake#GetMaker('python'), jobinfo, 0)
   AssertEqual maker.exe, '/usr/bin/env'
   AssertEqual maker.args[0], 'python'
   Assert maker.args[1] =~# '\vcompile\.py$'
 
+  " Uses jobinfo.bufnr (from previous buffer).
+  new
+  noautocmd setfiletype python
+  let maker = neomake#core#instantiate_maker(neomake#GetMaker('python'), jobinfo, 0)
+  AssertEqual maker.exe, '/usr/bin/env'
+  AssertEqual maker.args[0], 'python'
+  Assert maker.args[1] =~# '\vcompile\.py$'
+
+  " Uses jobinfo.bufnr (current buffer).
+  let jobinfo.bufnr = bufnr('%')
+  let maker = neomake#core#instantiate_maker(neomake#GetMaker('python'), jobinfo, 0)
+  AssertEqual maker.exe, 'python'
+  Assert maker.args[0] =~# '\vcompile\.py$'
+
+  " Handles missing jobinfo.bufnr.
+  let jobinfo = {}
+  let maker = neomake#core#instantiate_maker(neomake#GetMaker('python'), jobinfo, 0)
+  AssertEqual maker.exe, 'python'
+  Assert maker.args[0] =~# '\vcompile\.py$'
+
+  bwipe!
   bwipe!
