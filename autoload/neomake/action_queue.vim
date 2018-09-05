@@ -8,6 +8,7 @@ let s:action_queue_timer_timeouts = get(g:, 'neomake_action_queue_timeouts', {1:
 
 let g:neomake#action_queue#processed = {}
 let g:neomake#action_queue#not_processed = {}
+let g:neomake#action_queue#any_event = []
 
 let g:neomake#action_queue#_s = s:
 
@@ -107,7 +108,7 @@ function! s:process_action_queue(event) abort
     let q_for_this_event = []
     let i = 0
     for [events, v] in queue
-        if index(events, a:event) != -1
+        if index(events, a:event) != -1 || events is# g:neomake#action_queue#any_event
             call add(q_for_this_event, [i, v])
         endif
         let i += 1
